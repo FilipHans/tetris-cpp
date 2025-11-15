@@ -8,6 +8,20 @@ Game::Game()
     currentBlock = GetRandomBlock();
     nextBlock = GetRandomBlock();
     gameOver = false;
+    score = 0;
+    InitAudioDevice();
+    music = LoadMusicStream("Sounds/tetris-converted.mp3");
+    clearSound = LoadSound("Sounds/Sounds_clear.mp3");
+    rotateSound = LoadSound("Sounds/Sounds_rotate.mp3");
+    PlayMusicStream(music);
+}
+
+Game::~Game()
+{
+    UnloadMusicStream(music);
+    UnloadSound(rotateSound);
+    UnloadSound(clearSound);
+    CloseAudioDevice();
 }
 
 Block Game::GetRandomBlock()
@@ -32,13 +46,14 @@ std::vector<Block> Game::GetAllBlocks()
 void Game::Draw()
 {
     grid.Draw();
-    currentBlock.Draw();
+    currentBlock.Draw(11, 11);
+    nextBlock.Draw(270, 270);
 }
 
 void Game::HandleInput()
 {
     int keyPressed = GetKeyPressed();
-    if(gameOver && keyPressed != 0)
+    if(gameOver && keyPressed == KEY_R)
     {
         gameOver = false;
         Reset();
@@ -53,9 +68,11 @@ void Game::HandleInput()
         break;        
     case KEY_S:
         MoveBlockDown();
+        PointCalculator(0, 5);
         break;
     case KEY_W:
         RotateBlock();
+        PlaySound(rotateSound);
     default:
         break;
     }
@@ -93,7 +110,6 @@ void Game::MoveBlockDown()
         {
             currentBlock.Move(-1, 0);
             LockBlock();
-            currentBlock = nextBlock; 
         }        
     }
 }
@@ -114,7 +130,7 @@ bool Game::IsBlockOutside()
 
 void Game::RotateBlock()
 {
-        if (!gameOver)
+    if (!gameOver)
     {
         currentBlock.Rotate();
         if(IsBlockOutside() || BlockFits() == false)
@@ -137,7 +153,12 @@ void Game::LockBlock()
         gameOver = true;
     }
     nextBlock = GetRandomBlock();
-    grid.ClearFullRows();
+    int clearedRows = grid.ClearFullRows();
+    if (clearedRows > 0)
+    {
+        PlaySound(clearSound);
+        PointCalculator(clearedRows, 0);
+    }
 }
 
 bool Game::BlockFits()
@@ -155,8 +176,30 @@ bool Game::BlockFits()
 
 void Game::Reset()
 {
+    score = 0;
     grid.Initialize();
     blocks = GetAllBlocks();
     currentBlock = GetRandomBlock();
     nextBlock = GetRandomBlock();
+}
+
+void Game::PointCalculator(int rowsCleared, int movedDownPoints)
+{
+    switch(rowsCleared)
+    {
+        case 1:
+            score += 100;
+        break;
+
+        case 2:
+            score += 300;
+        break;
+        case 3:
+            score += 500;
+        break;
+        case 4:
+            score += 1000;
+        break;
+    }
+    score += movedDownPoints;
 }
