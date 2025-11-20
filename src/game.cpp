@@ -73,6 +73,11 @@ void Game::HandleInput()
     case KEY_W:
         RotateBlock();
         PlaySound(rotateSound);
+        break;
+    case KEY_SPACE:
+        MoveBlockAllDown();
+        PointCalculator(0, 40);
+        break;
     default:
         break;
     }
@@ -111,6 +116,26 @@ void Game::MoveBlockDown()
             currentBlock.Move(-1, 0);
             LockBlock();
         }        
+    }
+}
+
+void Game::MoveBlockAllDown()
+{
+    if(!gameOver)
+    {
+        std::vector<Position> tiles = currentBlock.GetCellPosition();
+        int lowPosition = 0;
+        for(Position item: tiles)
+        {
+            lowPosition = item.row > lowPosition ? item.row : lowPosition;
+        }
+        
+        currentBlock.Move(19 - lowPosition, 0);
+        while (IsBlockOutside() || BlockFits() == false)
+        {
+            currentBlock.Move(-1, 0);
+        }
+        LockBlock();
     }
 }
 

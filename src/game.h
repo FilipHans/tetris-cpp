@@ -24,6 +24,7 @@ public:
     void LockBlock();
     bool BlockFits();
     void Reset();
+    void MoveBlockAllDown();
     std::vector<Block> blocks;
     Block currentBlock;
     Block nextBlock;
