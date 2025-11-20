@@ -185,20 +185,25 @@ void Game::Reset()
 
 void Game::PointCalculator(int rowsCleared, int movedDownPoints)
 {
+    extern double intervals;
     switch(rowsCleared)
     {
         case 1:
             score += 100;
+            intervals -= 0.01;
         break;
 
         case 2:
             score += 300;
+            intervals -= 0.02;
         break;
         case 3:
             score += 500;
+            intervals -= 0.04;
         break;
         case 4:
             score += 1000;
+            intervals -= 0.06;
         break;
     }
     score += movedDownPoints;

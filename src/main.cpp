@@ -4,6 +4,7 @@
 #include <iostream>
 
 double lastUpdateTime = 0;
+double intervals = 0.2;
 bool EventTriggered(double interval)
 {
     double currentTime = GetTime();
@@ -29,7 +30,7 @@ int main()
         UpdateMusicStream(Game.music);
         Game.HandleInput();
         
-        if(EventTriggered(0.2))
+        if(EventTriggered(intervals))
         {
             Game.MoveBlockDown();
         }
